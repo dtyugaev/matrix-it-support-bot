@@ -1,0 +1,60 @@
+%% Архитектура matrix-it-support-bot
+%% Рендер: mmdc -i docs/architecture.mmd -o docs/architecture.png -w 2200
+flowchart LR
+    subgraph USERS["Пользователи"]
+        U["Сотрудник<br/>комната 1:1 с ботом"]
+        A["Администраторы бота<br/>комната администраторов"]
+    end
+
+    subgraph SYNAPSE["Matrix Synapse (connect.otr.ru)"]
+        SYNC["/sync · m.room.message · m.reaction<br/>m.room.member · invite"]
+        MEDIA["Медиа-хранилище<br/>+ Admin API"]
+    end
+
+    subgraph BOT["matrix-it-support-bot (asyncio)"]
+        direction TB
+        MC["src/matrix/client.py<br/>matrix-nio: sync, send, react, redact, upload"]
+        H["src/handlers<br/>commands · reactions · messages · membership · admin"]
+        ACT["src/handlers/actions.py<br/>сценарии меню"]
+        SRV["src/services<br/>users · issues · attachments · ui · admin_room · notifications"]
+        MENU["src/matrix/menu.py + formatting.py<br/>текстовые меню и эмодзи-реакции"]
+        TXT["src/texts.py<br/>все фразы бота"]
+        JC["src/jira/client.py<br/>aiohttp REST API v2"]
+        TR["src/jira/transitions.py<br/>матрица статус → действия"]
+        SL["src/jira/status_listener.py<br/>опрос плагина + резервный JQL"]
+        DB["src/db<br/>base · schema · repository"]
+        CFG["config.yaml<br/>src/config.py · src/logger.py"]
+        TASK1["Фоновая задача:<br/>мониторинг заявок"]
+        TASK2["Фоновая задача:<br/>очистка вложений по TTL"]
+    end
+
+    subgraph EXT["Внешние системы"]
+        JIRA["Jira jira-kis.otr.ru<br/>проект IT"]
+        PLUGIN["Плагин Jira Status Listener<br/>rest/flr/latest/new-status"]
+        PG[("PostgreSQL / SQLite")]
+        LOG["storage/*.log"]
+    end
+
+    U <--> SYNC
+    A <--> SYNC
+    SYNC <--> MC
+    MC --> H
+    H --> ACT
+    ACT --> SRV
+    SRV --> MENU
+    MENU --> TXT
+    SRV --> JC
+    JC --> JIRA
+    SRV --> TR
+    TR --> JC
+    TASK1 --> SL
+    SL --> PLUGIN
+    SL --> JC
+    TASK1 --> SRV
+    TASK2 --> SRV
+    SRV --> DB
+    DB --> PG
+    SRV --> MEDIA
+    MEDIA --> MC
+    CFG --> BOT
+    BOT --> LOG

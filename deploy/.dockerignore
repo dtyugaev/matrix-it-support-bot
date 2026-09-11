@@ -1,0 +1,7 @@
+.git
+.venv
+storage
+docs
+config.yaml
+__pycache__
+*.pyc

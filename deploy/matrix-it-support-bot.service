@@ -1,0 +1,27 @@
+[Unit]
+Description=matrix-it-support-bot — бот Службы технической поддержки (Matrix + Jira)
+Documentation=file:/opt/matrix-it-support-bot/docs/
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=matrixbot
+Group=matrixbot
+WorkingDirectory=/opt/matrix-it-support-bot
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/matrix-it-support-bot/.venv/bin/python3 /opt/matrix-it-support-bot/main.py --config /opt/matrix-it-support-bot/config.yaml
+Restart=always
+RestartSec=10
+TimeoutStopSec=30
+KillSignal=SIGINT
+
+# Ограничения безопасности: пишем только в каталог storage
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/opt/matrix-it-support-bot/storage
+
+[Install]
+WantedBy=multi-user.target

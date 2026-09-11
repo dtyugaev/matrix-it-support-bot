@@ -1,0 +1,45 @@
+# Запуск: docker compose up -d --build   (из каталога deploy/)
+services:
+  bot:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    image: matrix-it-support-bot:1.0.0
+    container_name: matrix-it-support-bot
+    restart: unless-stopped
+    volumes:
+      # Конфигурация монтируется только для чтения — секреты остаются на хосте
+      - ../config.yaml:/app/config.yaml:ro
+      # Каталог с БД (для sqlite), журналом, вложениями и хранилищем nio
+      - ../storage:/app/storage
+    environment:
+      TZ: Europe/Moscow
+    depends_on:
+      db:
+        condition: service_healthy
+    # Для просмотра журнала через docker logs включите logging.console: true в config.yaml
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  db:
+    image: postgres:16-alpine
+    container_name: matrix-it-support-bot-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: matrix_it_support_bot
+      POSTGRES_USER: bot
+      # Пароль должен совпадать с database.postgresql.password в config.yaml
+      POSTGRES_PASSWORD: ЗАМЕНИТЕ_НА_ПАРОЛЬ_БД
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bot -d matrix_it_support_bot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:
