@@ -88,7 +88,7 @@ class ReactionHandler:
             return
 
         if not profile:
-            await self.ctx.ui.send(room_id, t("not_registered"))
+            #await self.ctx.ui.send(room_id, t("not_registered"))
             await self.ctx.ui.guest_menu(room_id, user_id)
             return
 
