@@ -110,7 +110,7 @@ class Menu:
     def render(self, as_list: bool = True, title_bold: bool = True) -> str:
         """Собрать текст меню в Markdown."""
         title = f"**{self.title}**" if title_bold else self.title
-        lines = [title]
+        lines = [title, "\n"]
         if self.prefix_text:
             lines.append("")
             lines.append(self.prefix_text)
