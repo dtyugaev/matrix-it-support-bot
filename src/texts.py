@@ -228,8 +228,8 @@ TEXTS: Final[dict[str, str]] = {
     # ------------------------------------------------------------------
     # Тексты, которые бот отправляет в Jira (комментарии от имени заявителя)
     # ------------------------------------------------------------------
-    "jira_comment_prefix": "(Заявитель) [{displayname}]: {text}",
-    "jira_comment_attach_only": "(Заявитель) [{displayname}]: приложен файл",
+    "jira_comment_prefix": "[{displayname}]: {text}",
+    "jira_comment_attach_only": "[{displayname}]: приложен файл",
     "jira_comment_files_attached": "Приложены файлы",
     "jira_comment_confirm": "Пользователь подтвердил решение заявки",
 
