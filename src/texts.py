@@ -12,6 +12,8 @@ from __future__ import annotations
 
 from typing import Any, Final
 
+import re
+
 TEXTS: Final[dict[str, str]] = {
     # ------------------------------------------------------------------
     # Приветствие и общие сообщения
@@ -304,6 +306,22 @@ TEXTS: Final[dict[str, str]] = {
 }
 
 
+_PORTAL_URL: str = ""
+_ISSUE_KEY_RE = re.compile(r"^IT-\d+$")
+
+def configure_issue_link(portal_url: str) -> None:
+    """Задать базовый URL портала (вызывается один раз при старте бота)."""
+    global _PORTAL_URL
+    _PORTAL_URL = (portal_url or "").rstrip("/")
+
+
+def issue_link(issue_key: str) -> str:
+    key = str(issue_key or "").strip()
+    if not _PORTAL_URL or not _ISSUE_KEY_RE.match(key):
+        return key                   # portal_url не установлен в конфиге / не номер заявки
+    return f"[{key}]({_PORTAL_URL}/{key})"
+
+
 def t(key: str, **kwargs: Any) -> str:
     """Вернуть фразу по ключу с подстановкой параметров.
 
@@ -317,4 +335,6 @@ def t(key: str, **kwargs: Any) -> str:
         raise KeyError(f"Не найдена фраза с ключом '{key}' в src/texts.py") from exc
     if not kwargs:
         return template
+    if "issue_key" in kwargs:
+        kwargs = {**kwargs, "issue_key": issue_link(kwargs["issue_key"])}
     return template.format(**kwargs)

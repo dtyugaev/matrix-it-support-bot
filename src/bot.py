@@ -30,7 +30,7 @@ from src.services.issues import IssueService
 from src.services.notifications import NotificationService
 from src.services.ui import UiService
 from src.services.users import UserService
-from src.texts import t
+from src.texts import t, configure_issue_link
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +43,8 @@ class Bot:
         self.started_at = dt.datetime.now()
         self._start_ms = int(time.time() * 1000)
         self._tasks: list[asyncio.Task[Any]] = []
+
+        configure_issue_link(config.get("jira.portal_url", ""))
 
         self.db = Database(config)
         self.repos = Repositories(self.db)
