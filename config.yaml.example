@@ -1,106 +1,196 @@
 # =============================================================================
-# matrix-it-support-bot — конфигурация бота Службы технической поддержки
-# Все пути указываются относительно корня проекта либо абсолютно.
+# matrix-it-support-bot — конфигурация ИТ бота службы технической поддержки ОТР
 # =============================================================================
 
 matrix:
-  homeserver: "https://connect.otr.ru"        # Базовый URL сервера Matrix Synapse
-  user_id: "@it_support_bot:otr.ru"           # Matrix ID учётной записи бота
-  access_token: ""                            # Токен доступа бота (логин/пароль на сервере отключены)
-  device_id: "IT_Support_bot_device"          # Идентификатор устройства бота для сессии Synapse
-  admin_access_token: ""                      # Резервный токен с правами администратора сервера для Admin API
-  auto_join: true                             # Автоматически принимать приглашения в комнаты
-  sync_timeout: 30000                         # Таймаут long-poll синхронизации с Synapse, мс
-  encryption: false                           # Поддержка сквозного шифрования комнат (E2EE)
-  nio_store_path: "storage/nio_store"         # Каталог хранилища библиотеки matrix-nio
-  request_timeout: 30                         # Таймаут одного HTTP-запроса к Synapse, с
-  max_retries: 5                              # Количество повторных попыток при сетевой ошибке Synapse
-  retry_backoff: 2.0                          # Множитель задержки между повторными попытками Synapse
+  # Базовый URL сервера Matrix Synapse
+  homeserver: ""
+  # Matrix ID учётной записи бота
+  user_id: ""
+  # Токен доступа бота
+  access_token: ""
+  # Идентификатор устройства бота для сессии Synapse
+  device_id: ""
+  # Резервный токен с правами администратора сервера для Admin API
+  admin_access_token: ""
+  # Автоматически принимать приглашения в комнаты
+  auto_join: true
+  # Таймаут long-poll синхронизации с Synapse, мс
+  sync_timeout: 30000
+  # Поддержка сквозного шифрования комнат (E2EE)
+  encryption: false
+  # Каталог хранилища библиотеки matrix-nio
+  nio_store_path: "storage/nio_store"
+  # Таймаут одного HTTP-запроса к Synapse, с
+  request_timeout: 30
+  # Количество повторных попыток при сетевой ошибке Synapse
+  max_retries: 5
+  # Множитель задержки между повторными попытками Synapse
+  retry_backoff: 2.0
 
 database:
-  type: "postgresql"                          # Используемая БД: sqlite или postgresql
+  # Используемая БД: sqlite или postgresql
+  type: "postgresql"
   sqlite:
-    path: "storage/bot.db"                    # Файл базы данных SQLite
+    # Файл базы данных SQLite
+    path: "storage/bot.db"
   postgresql:
-    host: "localhost"                         # Хост сервера PostgreSQL
-    port: 5432                                # Порт сервера PostgreSQL
-    dbname: "matrix_it_support_bot"           # Имя базы данных
-    user: "bot"                               # Пользователь базы данных
-    password: ""                              # Пароль пользователя базы данных
-    connect_timeout: 10                       # Таймаут установки соединения с PostgreSQL, с
-  max_retries: 5                              # Количество повторных попыток подключения к БД
-  retry_backoff: 2.0                          # Множитель задержки между попытками подключения к БД
+    # Хост сервера PostgreSQL
+    host: ""
+    # Порт сервера PostgreSQL
+    port: 5432
+    # Имя базы данных
+    dbname: ""
+    # Пользователь базы данных
+    user: ""
+    # Пароль пользователя базы данных
+    password: ""
+    # Таймаут установки соединения с PostgreSQL, с
+    connect_timeout: 10
+  # Количество повторных попыток подключения к БД
+  max_retries: 5
+  # Множитель задержки между попытками подключения к БД
+  retry_backoff: 2.0
 
 logging:
-  level: "INFO"                               # Уровень логирования: DEBUG, INFO, WARNING, ERROR, CRITICAL
-  file_path: "storage/matrix-it-support-bot.log"  # Файл журнала (ротация не выполняется)
-  console: false                              # Дублировать журнал в стандартный вывод
-  format: "%(asctime)s %(levelname)-8s [%(name)s] %(message)s"  # Формат строки журнала
-  date_format: "%Y-%m-%d %H:%M:%S"            # Формат метки времени в журнале
-  quiet_loggers:                              # Логгеры библиотек, приглушённые до уровня WARNING
+  # Уровень логирования: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  level: "INFO"
+  # Файл журнала (ротация не выполняется)
+  file_path: "storage/matrix-it-support-bot.log"
+  # Дублировать журнал в стандартный вывод
+  console: false
+  # Формат строки журнала
+  format: "%(asctime)s %(levelname)-8s [%(name)s] %(message)s"
+  # Формат метки времени в журнале
+  date_format: "%Y-%m-%d %H:%M:%S"
+  # Логгеры библиотек, приглушённые до уровня WARNING
+  quiet_loggers:
     - "nio"
     - "urllib3"
     - "asyncio"
     - "aiohttp"
 
 jira:
-  url: "https://jira-kis.otr.ru"              # Базовый URL Jira
-  login: ""                                   # Сервисный логин Jira, от имени которого работает бот
-  password: ""                                # Пароль сервисной учётной записи Jira
-  verify_ssl: false                           # Проверять сертификат TLS при обращении к Jira
-  project: "IT"                               # Ключ проекта Jira, в котором создаются заявки
-  issue_type_id: "10000"                      # Идентификатор типа создаваемой заявки
-  portal_url: "https://jira-kis.otr.ru/servicedesk/customer/portal/6"  # Ссылка на портал заявок для пользователя
-  status_listener_url: "https://jira-kis.otr.ru/rest/flr/latest/new-status/"  # REST-эндпоинт плагина Jira Status Listener
-  poll_interval_seconds: 60                   # Частота опроса Jira и плагина уведомлений, с
-  poll_lookback_minutes: 15                   # Глубина выборки изменений при резервном опросе Jira, мин
-  issue_types_for_list:                       # Идентификаторы статусов заявок, попадающих в «Список моих заявок»
-    - "10017"
-    - "10005"
-    - "10002"
-    - "10901"
-  issues_per_page: 5                          # Количество заявок на одной странице списка
-  issues_max_pages: 10                        # Максимальное количество страниц пагинации
-  comments_per_issue: 3                       # Сколько последних комментариев показывать в карточке заявки
-  always_allow_comment: true                  # Разрешать пункт «Добавить комментарий» во всех статусах заявки
-  request_timeout: 30                         # Таймаут одного HTTP-запроса к Jira, с
-  max_retries: 4                              # Количество повторных попыток при сетевой ошибке Jira
-  retry_backoff: 2.0                          # Множитель задержки между повторными попытками Jira
-  subject_max_length: 255                     # Максимальная длина темы заявки
-  delete_processed_events: true                # Удалять обработанные события в плагине Jira Status Listener
-  fallback_poll_enabled: true                 # Включить резервный JQL-опрос, если плагин недоступен
-  notify_all_status_changes: false            # Уведомлять о любой смене статуса, а не только о ключевых
+  # Базовый URL Jira
+  url: "https://jira-kis.otr.ru"
+  # Сервисный логин Jira, от имени которого работает бот
+  login: ""
+  # Пароль сервисной учётной записи Jira
+  password: ""
+  # Проверять SSL сертификат при подключении к Jira
+  verify_ssl: false
+  # Ключ проекта Jira, в котором создаются заявки
+  project: "IT"
+  # Идентификатор типа создаваемой заявки
+  issue_type_id: "10000"
+  # Ссылка на портал заявок для пользователя
+  portal_url: "https://jira-kis.otr.ru/servicedesk/customer/portal/6"
+  # REST-endpoint плагина Jira Status Listener
+  status_listener_url: "https://jira-kis.otr.ru/rest/flr/latest/new-status/"
+  # Частота опроса Jira и плагина уведомлений, с
+  poll_interval_seconds: 60
+  # Глубина времени выборки изменений заявок в опросе Jira, мин
+  poll_lookback_minutes: 15
+  # Идентификаторы статусов заявок, попадающих в «Список моих заявок»
+  issue_types_for_list:
+    - "10002"  # Отложено
+    - "10005"  # Запрос информации
+    - "10006"  # Спам
+    - "10017"  # В работе
+#    - "10508" # Закрыто
+    - "10900"  # Зарегистрировано
+    - "10901"  # Ожидает решения
+    - "10902"  # Ответ предоставлен
+#    - "10903" # Предложено решение
+    - "10904"  # Переоткрыто
+    - "12000"  # Согласование ФЗ
+    - "14200"  # Передано на 3 линию
+    - "14300"  # Согласование УИБ
+    - "14301"  # Прокомментировано УИБ
+
+  # Количество заявок на одной странице списка
+  issues_per_page: 5
+  # Максимальное количество страниц пагинации
+  issues_max_pages: 10
+  # Сколько последних комментариев показывать в карточке заявки
+  comments_per_issue: 3
+  # Разрешать пункт «Добавить комментарий» во всех статусах заявки
+  always_allow_comment: true
+  # Таймаут одного HTTP-запроса к Jira, с
+  request_timeout: 30
+  # Количество повторных попыток при сетевой ошибке Jira
+  max_retries: 4
+  # Множитель задержки между повторными попытками Jira
+  retry_backoff: 2.0
+  # Максимальная длина темы заявки
+  subject_max_length: 255
+  # Удалять обработанные события в плагине Jira Status Listener
+  delete_processed_events: true
+  # Включить резервный JQL-опрос, если плагин недоступен
+  fallback_poll_enabled: true
+  # Уведомлять о любой смене статуса, а не только о ключевых
+  notify_all_status_changes: true
+
+  # Вложения из заявок в zip-архиве
   attachments:
-    dir: "storage/attachments"                # Каталог для архивов вложений и файлов пользователей
-    zip_filename_format: "%(issue_key)s_%Y-%m-%d_%H-%M-%S.zip"  # Шаблон имени zip-архива вложений
-    max_size: 30                              # Максимальный размер одного файла, МБ
-    attachment_ttl: 604800                    # Время жизни отправленного архива до автоудаления, с
-    cleanup_interval: 300                     # Частота работы сборщика мусора вложений, с
-    delete_from_room: true                    # Удалять сообщение с архивом из комнаты Matrix
-    delete_from_bot_dir: true                 # Удалять локальный файл архива из каталога бота
-    delete_from_synapse: true                 # Удалять файл из медиа-хранилища Synapse через Admin API
+    # Каталог для архивов вложений и файлов пользователей
+    dir: "storage/attachments"
+    # Шаблон имени zip-архива вложений
+    zip_filename_format: "%(issue_key).zip"
+    # Максимальный размер одного файла, МБ
+    max_size: 30
+    # Время жизни отправленного архива до автоудаления, с
+    attachment_ttl: 604800
+    # Частота работы сборщика мусора вложений, с
+    cleanup_interval: 300
+    # Удалять сообщение с архивом из комнаты Matrix
+    delete_from_room: true
+    # Удалять локальный файл архива из каталога бота
+    delete_from_bot_dir: true
+    # Удалять файл из медиа-хранилища Synapse через Admin API
+    delete_from_synapse: true
 
 menu:
-  menu_items_as_list: true                    # Выводить пункты меню списком, иначе обычным текстом
-  help_commands_as_list: true                 # Выводить команды в разделе «Помощь» списком
-  markup: "markdown"                          # Разметка сообщений бота: markdown, html или plain
-  title_bold: true                            # Выводить заголовок меню жирным шрифтом
-  show_portal_link: true                      # Добавлять в карточку заявки ссылку на портал Jira
+  # Выводить пункты меню списком, иначе обычным текстом
+  menu_items_as_list: true
+  # Выводить команды в разделе «Помощь» списком
+  help_commands_as_list: true
+  # Разметка сообщений бота: markdown, html или plain
+  markup: "markdown"
+  # Выводить заголовок меню жирным шрифтом
+  title_bold: true
+  # Добавлять в карточку заявки ссылку на портал Jira
+  show_portal_link: true
 
 administration:
-  admin_room_id: ""                           # Комната администраторов бота, куда идут служебные события
-  admins:                                     # Администраторы бота (Matrix ID)
+  # Комната администраторов бота, куда идут служебные события
+  admin_room_id: ""
+  # Администраторы бота (Matrix ID)
+  admins:
     - "@tyugaev.dmitrii:otr.ru"
-  support_email: "it@otr.ru"                  # Контакт поддержки, подставляемый в тексты ошибок
-  notify_events:                              # Какие события пересылать в комнату администраторов
-    bot_started: true                         # Запуск бота
-    bot_stopped: true                         # Остановка бота
-    user_registered: true                     # Регистрация пользователя в комнате
-    user_deleted: true                        # Удаление профиля или выход пользователя
-    profile_not_found: true                   # Не найден профиль в БД при рассылке уведомления
-    issue_created: false                      # Создание заявки пользователем
-    feedback: true                            # Новое обращение обратной связи
-    jira_error: true                          # Ошибка обращения к Jira
-    matrix_error: true                        # Ошибка обращения к Synapse
-    attachment_cleanup_error: true            # Ошибка автоочистки вложений
-    room_hijack_attempt: false                # Сообщение от чужого пользователя в закреплённой комнате
+  # Контакт поддержки, подставляемый в тексты ошибок
+  support_email: "it@otr.ru"
+  # Какие события пересылать в комнату администраторов
+  notify_events:
+    # Запуск бота
+    bot_started: true
+    # Остановка бота
+    bot_stopped: true
+    # Регистрация пользователя в комнате
+    user_registered: true
+    # Удаление профиля или выход пользователя
+    user_deleted: true
+    # Не найден профиль в БД при рассылке уведомления
+    profile_not_found: false
+    # Создание заявки пользователем
+    issue_created: false
+    # Новое обращение обратной связи
+    feedback: true
+    # Ошибка обращения к Jira
+    jira_error: true
+    # Ошибка обращения к Synapse
+    matrix_error: true
+    # Ошибка автоочистки вложений
+    attachment_cleanup_error: true
+    # Сообщение от чужого пользователя в закреплённой комнате
+    room_hijack_attempt: false
