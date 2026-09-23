@@ -42,12 +42,14 @@ class UiService:
         menu: menus.Menu,
         user_id: str | None = None,
         prefix_text: str = "",
+        title_bold: bool | None = None
     ) -> str | None:
         """Отправить меню и проставить все его реакции."""
         if prefix_text:
             await self.send(room_id, prefix_text)
 
-        text = menu.render(as_list=self._as_list, title_bold=self._title_bold)
+        bold = self._title_bold if title_bold is None else title_bold
+        text = menu.render(as_list=self._as_list, title_bold=bold)
         event_id = await self._matrix.send_text(room_id, text)
         if not event_id:
             logger.error("Не удалось отправить меню '%s' в комнату %s", menu.menu_id, room_id)

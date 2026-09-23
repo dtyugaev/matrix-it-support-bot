@@ -87,6 +87,7 @@ TEXTS: Final[dict[str, str]] = {
     "item_confirm": "Подтвердить решение",
     "item_comment": "Добавить комментарий",
     "item_attachments": "Получить вложения",
+    "item_view_issue": "Просмотр заявки",
     "item_cancel": "Отмена ввода",
     "item_yes": "Да",
     "item_no": "Нет",

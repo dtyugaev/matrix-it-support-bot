@@ -20,6 +20,7 @@ from typing import Any
 from src.constants import ADMIN_EVENT_JIRA_ERROR, ADMIN_EVENT_PROFILE_NOT_FOUND
 from src.db.repository import Repositories
 from src.jira.status_listener import StatusListenerClient
+from src.matrix import menu as menus
 from src.services.admin_room import AdminRoomService
 from src.services.ui import UiService
 from src.texts import t
@@ -115,15 +116,17 @@ class NotificationService:
             await self._safe_delete(item.get("event_id", ""))
             return 0
 
-        text = "\n\n".join(
-            [
-                t(item["text_key"], issue_key=item["issue_key"], status=item.get("status", "")),
-                t("notification_footer"),
-            ]
-        )
+        text = t(item["text_key"], issue_key=item["issue_key"], status=item.get("status", ""))
         delivered = 0
+
         for room in rooms:
-            if await self._ui.send(room["room_id"], text):
+            event_id = await self._ui.send_menu(
+                room["room_id"],
+                menus.notification_menu(item["issue_key"], text),
+                user_id=room.get("user_id"),
+                title_bold=False,
+            )
+            if event_id:
                 delivered += 1
             else:
                 logger.error(

@@ -33,6 +33,7 @@ MENU_ISSUE_ACTIONS = "issue_actions"
 MENU_PROFILE = "profile"
 MENU_CANCEL = "cancel"
 MENU_CONFIRM = "confirm"
+MENU_NOTIFICATION = "notification"
 
 # ---------------------------------------------------------------------------
 # Эмодзи-маркеры пунктов
@@ -54,6 +55,7 @@ EMOJI_REOPEN = "🔁"
 EMOJI_CONFIRM = "✅"
 EMOJI_COMMENT = "🗨️"
 EMOJI_ATTACHMENTS = "📎"
+EMOJI_VIEW_ISSUE = "ℹ️"
 EMOJI_CANCEL = "❌"
 EMOJI_YES = "✅"
 EMOJI_NO = "❌"
@@ -220,6 +222,17 @@ def issue_actions_menu(issue_key: str, actions: Iterable[str]) -> Menu:
         MENU_ISSUE_ACTIONS,
         t("menu_title_issue_actions", issue_key=issue_key),
         items,
+        payload={"issue_key": issue_key},
+    )
+
+
+def notification_menu(issue_key: str, text: str) -> Menu:
+    """Уведомление по заявке с кнопкой «Просмотр заявки»."""
+    return Menu(
+        MENU_NOTIFICATION,
+        text,
+        [MenuItem(EMOJI_VIEW_ISSUE, t("item_view_issue"), "open_issue",
+                  {"issue_key": issue_key})],
         payload={"issue_key": issue_key},
     )
 
