@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import datetime as dt
 from typing import Any, Sequence
 
 from src.jira import transitions as tr
@@ -47,6 +48,7 @@ class JiraClient:
         self._max_retries = int(config.get("jira.max_retries", 4))
         self._backoff = float(config.get("jira.retry_backoff", 2.0))
         self._comments_per_issue = int(config.get("jira.comments_per_issue", 3))
+        self._comments_desc = str(config.get("jira.comments_sort_order", "desc")).lower() != "asc"
         self._session: Any = None
         self.available = False
 
@@ -312,21 +314,24 @@ class JiraClient:
         }
 
     def _public_comments(self, raw_comments: list[dict[str, Any]]) -> list[str]:
-        """Оставить только публичные комментарии и вернуть последние N.
+        """Оставить только публичные комментарии и вернуть последние N, отсортированные по конфигу.
 
         Комментарии с ограничением видимости (``visibility``) пользователю не
         показываются — логика перенесена из эталонного бота.
         """
-        public: list[str] = []
-        for comment in raw_comments:
-            if comment.get("visibility"):
-                continue
-            created = format_jira_datetime(comment.get("created") or "", short=True)
-            body = clean_jira_markup(comment.get("body") or "")
-            public.append(f"{created}\n{body}")
         if self._comments_per_issue <= 0:
             return []
-        return public[-self._comments_per_issue :]
+        public = [c for c in raw_comments if not c.get("visibility")]
+        # Явно сортируем по времени создания: порядок в ответе Jira не гарантирован
+        public.sort(key=lambda c: _comment_ts(c.get("created") or ""))
+        latest = public[-self._comments_per_issue:]
+        if self._comments_desc:
+            latest.reverse()
+        return [
+            f"{format_jira_datetime(c.get('created') or '', short=True)}\n"
+            f"{clean_jira_markup(c.get('body') or '')}"
+            for c in latest
+        ]
 
     async def add_comment(self, issue_key: str, body: str) -> bool:
         """Добавить комментарий к заявке."""
@@ -459,3 +464,11 @@ def sort_issues(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
 def _invert(value: str) -> str:
     """Инвертировать строку для сортировки по убыванию внутри группы."""
     return "".join(chr(0x10FFFF - ord(char)) if ord(char) < 0x10FFFF else char for char in value)
+
+
+def _comment_ts(value: str) -> dt.datetime:
+    """Дата Jira '2026-07-10T15:11:51.000+0300' с учётом таймзоны."""
+    try:
+        return dt.datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f%z")
+    except ValueError:
+        return dt.datetime.min.replace(tzinfo=dt.timezone.utc)

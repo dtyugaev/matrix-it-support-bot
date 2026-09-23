@@ -150,7 +150,7 @@ TEXTS: Final[dict[str, str]] = {
         "**Количество вложений**: {attachments_count}"
     ),
     "issue_description_block": "**Описание заявки:**\n{description}",
-    "issue_comments_block": "**Последний комментарий:**\n{comments}",
+    "issue_comments_block": "**Последние комментарии:**\n{comments}",
     "issue_comments_empty": "Комментарии к запросу ещё не добавлены",
     "issue_portal_link": "**Заявка на портале**: {url}",
 
@@ -264,7 +264,7 @@ TEXTS: Final[dict[str, str]] = {
         "закреплённую за {owner}."
     ),
     "admin_help": (
-        "**Команды администратора (в комнате администраторов)**\n"
+        "**Команды администратора**\n"
         "- `!admin help` — эта справка\n"
         "- `!admin status` — версия бота, время запуска, состояние Jira/Synapse\n"
         "- `!admin users <критерий>` — поиск зарегистрированных пользователей\n"

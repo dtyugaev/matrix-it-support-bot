@@ -64,6 +64,7 @@ DEFAULTS: dict[str, Any] = {
         "issues_per_page": 5,
         "issues_max_pages": 10,
         "comments_per_issue": 3,
+        "comments_sort_order": "desc",
         "always_allow_comment": True,
         "request_timeout": 30,
         "max_retries": 4,
@@ -204,6 +205,8 @@ class Config:
             raise ConfigError("jira.issues_per_page должен быть больше нуля")
         if int(self.get("jira.poll_interval_seconds", 60)) < 5:
             raise ConfigError("jira.poll_interval_seconds не может быть меньше 5 секунд")
+        if str(self.get("jira.comments_sort_order", "desc")).lower() not in ("asc", "desc"):
+            raise ConfigError("jira.comments_sort_order должен быть asc или desc")
 
         user_id = str(self.get("matrix.user_id", ""))
         if not user_id.startswith("@") or ":" not in user_id:
