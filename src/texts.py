@@ -152,7 +152,7 @@ TEXTS: Final[dict[str, str]] = {
     "issue_description_block": "**Описание заявки:**\n{description}",
     "issue_comments_block": "**Последние комментарии:**\n{comments}",
     "issue_comments_empty": "Комментарии к запросу ещё не добавлены",
-    "issue_comment_line": "**{created} {author}:**\n{body}",
+    "issue_comment_line": "**{created} · {author}:**\n{body}",
     "issue_comment_author_unknown": "Неизвестный автор",
     "issue_portal_link": "**Заявка на портале**: {url}",
 
@@ -241,9 +241,9 @@ TEXTS: Final[dict[str, str]] = {
     # ------------------------------------------------------------------
     # Уведомления по заявкам
     # ------------------------------------------------------------------
-    "notification_information_request": "По заявке **{issue_key}** запрошена дополнительная информация.",
-    "notification_solution_proposed": "По заявке **{issue_key}** предложено решение.",
-    "notification_status_changed": "Заявка **{issue_key}**: новый статус «{status}».",
+    "notification_information_request": "По заявке **{issue_key} «{summary}»** запрошена дополнительная информация.",
+    "notification_solution_proposed": "По заявке **{issue_key} «{summary}»** предложено решение.",
+    "notification_status_changed": "Заявка **{issue_key} «{summary}»**: новый статус «{status}».",
 
     # ------------------------------------------------------------------
     # Комната администраторов

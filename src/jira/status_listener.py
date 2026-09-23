@@ -93,16 +93,19 @@ class StatusListenerClient:
             text_key = "notification_status_changed"
 
         jira_login = _extract_login(event)
-        if not jira_login:
+        summary = str(event.get("summary") or "")
+        if not jira_login or not summary:
             # Плагин не всегда отдаёт логин автора — берём его из самой заявки,
             # т.к. уникальный идентификатор пользователя в Jira — jira_login (п. 4.2).
             issue = await self._jira.get_issue(issue_key)
-            jira_login = (issue or {}).get("reporter_login", "")
+            jira_login = jira_login or (issue or {}).get("reporter_login", "")
+            summary = summary or (issue or {}).get("summary", "")
 
         return {
             "event_id": str(event.get("id") or ""),
             "event_key": f"{issue_key}:{status}:{event.get('id') or event.get('updated') or ''}",
             "issue_key": issue_key,
+            "summary": summary,
             "status": status,
             "text_key": text_key,
             "jira_login": jira_login,
@@ -147,6 +150,7 @@ class StatusListenerClient:
                     "event_id": "",
                     "event_key": f"{issue.get('key')}:{status}:{fields.get('updated')}",
                     "issue_key": str(issue.get("key", "")).upper(),
+                    "summary": fields.get("summary") or "",
                     "status": status,
                     "text_key": text_key,
                     "jira_login": ((fields.get("reporter") or {}).get("name") or ""),

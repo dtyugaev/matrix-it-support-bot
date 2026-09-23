@@ -23,6 +23,7 @@ from src.jira.status_listener import StatusListenerClient
 from src.matrix import menu as menus
 from src.services.admin_room import AdminRoomService
 from src.services.ui import UiService
+from src.utils.text import truncate
 from src.texts import t
 
 logger = logging.getLogger(__name__)
@@ -116,7 +117,12 @@ class NotificationService:
             await self._safe_delete(item.get("event_id", ""))
             return 0
 
-        text = t(item["text_key"], issue_key=item["issue_key"], status=item.get("status", ""))
+        text = t(
+            item["text_key"],
+            issue_key=item["issue_key"],
+            summary=truncate(item.get("summary") or "-", 200),
+            status=item.get("status", ""),
+        )
         delivered = 0
 
         for room in rooms:
