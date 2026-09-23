@@ -11,11 +11,13 @@ from __future__ import annotations
 import asyncio
 import logging
 import datetime as dt
+import re
 from typing import Any, Sequence
 
 from src.jira import transitions as tr
 from src.utils.dates import format_jira_datetime
 from src.utils.text import clean_jira_markup
+from src.texts import t
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +26,8 @@ SWITCH_OK = 0
 SWITCH_WRONG_STATUS = 255
 SWITCH_ATTACH_ERROR = -1
 
+#: Префикс комментариев, отправленных через бота: "[Иван Иванов]: текст"
+_BOT_PREFIX_RE = re.compile(r"^\s*\[(?P<name>[^\]\n]+)\]:\s?")
 
 class JiraError(Exception):
     """Ошибка обращения к Jira (сетевая или логическая)."""
@@ -327,11 +331,19 @@ class JiraClient:
         latest = public[-self._comments_per_issue:]
         if self._comments_desc:
             latest.reverse()
-        return [
-            f"{format_jira_datetime(c.get('created') or '', short=True)}\n"
-            f"{clean_jira_markup(c.get('body') or '')}"
-            for c in latest
-        ]
+
+        result: list[str] = []
+        for comment in latest:
+            author, body = _comment_author_and_body(comment, self._login)
+            result.append(
+                t(
+                    "issue_comment_line",
+                    created=format_jira_datetime(comment.get("created") or "", short=True),
+                    author=author,
+                    body=clean_jira_markup(body),
+                )
+            )
+        return result
 
     async def add_comment(self, issue_key: str, body: str) -> bool:
         """Добавить комментарий к заявке."""
@@ -472,3 +484,18 @@ def _comment_ts(value: str) -> dt.datetime:
         return dt.datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f%z")
     except ValueError:
         return dt.datetime.min.replace(tzinfo=dt.timezone.utc)
+
+
+def _comment_author_and_body(comment: dict[str, Any], bot_login: str) -> tuple[str, str]:
+    """Автор и текст комментария с учётом префикса бота."""
+    author = comment.get("author") or {}
+    login = str(author.get("name") or "")
+    raw_body = comment.get("body") or ""
+
+    if login and bot_login and login.lower() == bot_login.lower():
+        match = _BOT_PREFIX_RE.match(raw_body)
+        if match:
+            return match.group("name").strip(), raw_body[match.end():]
+
+    name = author.get("displayName") or login or t("issue_comment_author_unknown")
+    return name, raw_body

@@ -152,6 +152,8 @@ TEXTS: Final[dict[str, str]] = {
     "issue_description_block": "**Описание заявки:**\n{description}",
     "issue_comments_block": "**Последние комментарии:**\n{comments}",
     "issue_comments_empty": "Комментарии к запросу ещё не добавлены",
+    "issue_comment_line": "**{created} {author}:**\n{body}",
+    "issue_comment_author_unknown": "Неизвестный автор",
     "issue_portal_link": "**Заявка на портале**: {url}",
 
     # ------------------------------------------------------------------
