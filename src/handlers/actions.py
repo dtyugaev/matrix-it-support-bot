@@ -72,8 +72,6 @@ class ActionHandler:
     async def show_help(self, room_id: str, user_id: str) -> None:
         """Справка по командам и навигации."""
         text = self.ctx.ui.help_text()
-        if self.ctx.admin_room.is_admin(user_id):
-            text = f"{text}\n\n{t('admin_help')}"
         await self.ctx.ui.send(room_id, text)
 
     async def show_profile(self, room_id: str, user_id: str, profile: Row) -> None:
