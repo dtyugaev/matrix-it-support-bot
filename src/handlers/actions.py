@@ -51,13 +51,12 @@ class ActionHandler:
             await ctx.ui.error(room_id)
             return
 
-        await ctx.ui.send(room_id, t("greeting_registered", displayname=profile["displayname"]))
         await ctx.ui.send(
             room_id,
             t(
                 "registered_ok",
-                jira_login=profile["jira_login"],
-                email=profile.get("email") or t("registered_email_empty"),
+                room_id=profile["room_id"],
+                user_id=profile["user_id"],
             ),
         )
         await ctx.ui.main_menu(room_id, user_id)
